@@ -4,6 +4,7 @@ const messageSchema = new mongoose.Schema(
 	{
 		conversationId: {
 			type: String,
+			required: true,
 		},
 		sender: {
 			type: String,
@@ -12,9 +13,9 @@ const messageSchema = new mongoose.Schema(
 			text: {
 				type: String,
 			},
-			image: {
+			images: {
 				type: Array,
-				default:[]
+				default: [],
 			},
 		},
 	},

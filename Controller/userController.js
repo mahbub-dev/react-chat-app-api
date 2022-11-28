@@ -21,7 +21,8 @@ const createUser = async (req, res) => {
 			});
 		} else {
 			const newUser = await user.save();
-			res.status(200).json(newUser);
+			const { password, ...others } = newUser._doc;
+			res.status(200).json(others);
 		}
 	} catch (e) {
 		console.log(e);
@@ -44,7 +45,8 @@ const updateUser = async (req, res) => {
 			$set: updateUserData,
 		});
 		const user = await User.findById(userId);
-		res.status(200).json(user);
+		const { password, ...others } = user._doc;
+		res.status(200).json(others);
 	} catch (e) {
 		console.log(e);
 		res.status(500);
@@ -59,10 +61,10 @@ const getUser = async (req, res) => {
 		const user = await User.find();
 		if (search) {
 			if (search === userId) {
-				const user = await User.findById(userId);
-				res.status(200).json(user);
+				let user = await User.findById(userId);
+				const { password, ...others } = user._doc;
+				res.status(200).json(others);
 			} else {
-				
 				const filterUser = user.filter(
 					(i) =>
 						i.username
@@ -70,12 +72,15 @@ const getUser = async (req, res) => {
 							.includes(search.toLowerCase()) ||
 						i.phone.includes(search) ||
 						i._id.toString().includes(search.toString()) ||
-						i.email.toLowerCase().includes(search.toLowerCase())
+						(i.email.toLowerCase().includes(search.toLowerCase()) &&
+							i._id.toString() !== userId)
 				);
 				res.status(200).json(filterUser);
 			}
 		} else {
-			res.status(200).json(user);
+			res.status(200).json(
+				user.filter((i) => i._id.toString() !== userId)
+			);
 		}
 	} catch (e) {
 		console.log(e);

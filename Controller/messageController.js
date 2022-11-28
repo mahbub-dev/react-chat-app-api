@@ -1,18 +1,24 @@
 ﻿const Message = require("../Model/Message");
+const Conversation = require("../Model/Conversation");
 
 // add Message
 const addMessage = async (req, res) => {
-	const { conversationId, text } = req.body;
+	const { conversationId, message } = req.body;
+	const { images, text } = message;
 	const sender = req.user.id;
-	const newMessage = new Message({
-		conversationId,
-		sender,
-		text,
-	});
-
 	try {
-		const savedMessage = await newMessage.save();
-		res.status(200).json(savedMessage);
+		const conversation = await Conversation.findById(conversationId);
+		if (conversation) {
+			const newMessage = new Message({
+				conversationId,
+				sender,
+				message: { text, images: images },
+			});
+			const savedMessage = await newMessage.save();
+			res.status(200).json(savedMessage);
+		} else {
+			res.json("404 not found");
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);

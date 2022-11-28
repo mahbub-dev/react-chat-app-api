@@ -2,14 +2,23 @@
 
 // add conversation
 const addConversation = async (req, res) => {
-    const senderId = req.user.id;
+	const senderId = req.user.id;
 	const { receiverId } = req.body;
-	const newConversation = new Conversation({
-		member: [senderId, receiverId]
-	});
 	try {
-		const savedConversation = await newConversation.save();
-		res.status(200).json(savedConversation);
+		const pattern1 = [senderId, receiverId];
+		const pattern2 = [receiverId, senderId];
+		const conversation = await Conversation.findOne({
+			$or: [{ member: pattern1 }, { member: pattern2 }],
+		});
+		if (conversation) {
+			res.status(200).json(conversation);
+		} else {
+			const newConversation = new Conversation({
+				member: [senderId, receiverId],
+			});
+			const savedConversation = await newConversation.save();
+			res.status(200).json(savedConversation);
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);
@@ -22,7 +31,11 @@ const getConversation = async (req, res) => {
 		const conversation = await Conversation.find({
 			member: { $in: [req.params.userId] },
 		});
-		res.status(200).json(conversation);
+		if (conversation.length >= 1) {
+			res.status(200).json(conversation);
+		} else {
+			res.status(404).json("not found");
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);
