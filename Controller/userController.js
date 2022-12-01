@@ -1,4 +1,6 @@
 ﻿const User = require("../Model/User");
+const Conversation = require("../Model/Conversation");
+const Message = require("../Model/Message");
 const bcrypt = require("bcrypt");
 // create
 const createUser = async (req, res) => {
@@ -59,6 +61,19 @@ const getUser = async (req, res) => {
 	const userId = req.user.id;
 	try {
 		const user = await User.find();
+		const conversation = await Conversation.find();
+		let loggedUserConv = conversation.filter((i) =>
+			i.member.findIndex((i) => i === userId)
+		);
+		// console.log(loggedUserConv)
+
+		const lastMessag = async (conversationId, sender, receiver) => {
+			const messages = await Message.find({ conversationId });
+			let last = { sms: "" };
+			messages.forEach((i) => {
+				i.sender === userId;
+			});
+		};
 		if (search) {
 			if (search === userId) {
 				let user = await User.findById(userId);

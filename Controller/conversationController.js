@@ -1,4 +1,5 @@
 ﻿const Conversation = require("../Model/Conversation");
+const Message = require("../Model/Message");
 
 // add conversation
 const addConversation = async (req, res) => {
@@ -7,10 +8,13 @@ const addConversation = async (req, res) => {
 	try {
 		const pattern1 = [senderId, receiverId];
 		const pattern2 = [receiverId, senderId];
-		const conversation = await Conversation.findOne({
-			$or: [{ member: pattern1 }, { member: pattern2 }],
-		});
-		if (conversation) {
+		const conversation = await Conversation.find();
+		const targetedConv = conversation.find((i) =>
+			pattern1.every((ev) => i.member.includes(ev))
+		);
+		console.log(targetedConv);
+
+		if (targetedConv) {
 			res.status(200).json(conversation);
 		} else {
 			const newConversation = new Conversation({
@@ -56,4 +60,14 @@ const getTwoUserConversation = async (req, res) => {
 	}
 };
 
+const getAllConversation = async (req, res) => {
+	try {
+		const conversation = await Conversation.find();
+		let userLastMessage = [];
+		conversation.forEach((i) => {});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json(err);
+	}
+};
 module.exports = { addConversation, getConversation, getTwoUserConversation };
