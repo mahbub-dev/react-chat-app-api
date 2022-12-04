@@ -8,6 +8,7 @@ const addMessage = async (req, res) => {
 	const sender = req.user.id;
 	try {
 		const conversation = await Conversation.findById(conversationId);
+		console.log(conversationId);
 		if (conversation) {
 			const newMessage = new Message({
 				conversationId,
@@ -32,7 +33,11 @@ const getMessage = async (req, res) => {
 		const message = await Message.find({
 			conversationId,
 		});
-		res.status(200).json(message);
+		if (message.length === 0) {
+			res.status(200).json("not found");
+		} else {
+			res.status(200).json(message);
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);

@@ -1,4 +1,4 @@
-﻿const User = require("../Model/User");
+const User = require("../Model/User");
 const Conversation = require("../Model/Conversation");
 const Message = require("../Model/Message");
 const bcrypt = require("bcrypt");
@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const createUser = async (req, res) => {
 	const { username, email, phone, password } = req.body.signupData;
 	const salt = await bcrypt.genSalt(10);
+	clg(salt);
 	const hashPassword = await bcrypt.hash(password, salt);
 	const user = new User({
 		username,
@@ -41,7 +42,8 @@ const updateUser = async (req, res) => {
 		const hassPassword = await bcrypt.hash(updateUserData.password, salt);
 		updateUserData.password = hassPassword;
 	}
-	const userId = req.user.id;
+	let userId = req.user.id;
+	// req?.body?.userId ? (userId = req.body.userId) : (userId = req.user.id);
 	try {
 		await User.findByIdAndUpdate(userId, {
 			$set: updateUserData,
@@ -60,20 +62,26 @@ const getUser = async (req, res) => {
 	const search = req.query?.search;
 	const userId = req.user.id;
 	try {
-		const user = await User.find();
+		let user = await User.find();
 		const conversation = await Conversation.find();
 		let loggedUserConv = conversation.filter((i) =>
-			i.member.findIndex((i) => i === userId)
+			i.member.includes(userId)
 		);
-		// console.log(loggedUserConv)
-
-		const lastMessag = async (conversationId, sender, receiver) => {
-			const messages = await Message.find({ conversationId });
-			let last = { sms: "" };
-			messages.forEach((i) => {
-				i.sender === userId;
-			});
-		};
+		let chatFriendId = [];
+		if (loggedUserConv.length > 0) {
+			for (let i = 0; i < loggedUserConv.length; i++) {
+				const element = loggedUserConv[i];
+				chatFriendId.push(element);
+			}
+		}
+		// console.log(loggedUserConv[0]._id);
+		// const lastMessag = async (conversationId, sender, receiver) => {
+		// 	const messages = await Message.find({ conversationId });
+		// 	let last = { sms: "" };
+		// 	messages.forEach((i) => {
+		// 		i.sender === userId;
+		// 	});
+		// };
 		if (search) {
 			if (search === userId) {
 				let user = await User.findById(userId);
@@ -90,7 +98,11 @@ const getUser = async (req, res) => {
 						(i.email.toLowerCase().includes(search.toLowerCase()) &&
 							i._id.toString() !== userId)
 				);
-				res.status(200).json(filterUser);
+				if (!filterUser) {
+					res.status(201).json(" ");
+				} else {
+					res.status(200).json(filterUser);
+				}
 			}
 		} else {
 			res.status(200).json(

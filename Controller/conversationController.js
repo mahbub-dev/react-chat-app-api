@@ -12,10 +12,8 @@ const addConversation = async (req, res) => {
 		const targetedConv = conversation.find((i) =>
 			pattern1.every((ev) => i.member.includes(ev))
 		);
-		console.log(targetedConv);
-
 		if (targetedConv) {
-			res.status(200).json(conversation);
+			res.status(200).json(targetedConv);
 		} else {
 			const newConversation = new Conversation({
 				member: [senderId, receiverId],

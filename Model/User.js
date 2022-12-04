@@ -31,12 +31,13 @@ const UserSchema = new mongoose.Schema(
 		},
 		blacklist: {
 			type: Array,
-			default:[]
+			default: [],
 		},
 		chatList: {
 			type: Array,
-			default:[]
+			default: [],
 		},
+		lastActive: { type: String },
 	},
 	{ timestamps: true }
 );
