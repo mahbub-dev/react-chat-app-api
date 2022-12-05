@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const createUser = async (req, res) => {
 	const { username, email, phone, password } = req.body.signupData;
 	const salt = await bcrypt.genSalt(10);
-	clg(salt);
 	const hashPassword = await bcrypt.hash(password, salt);
 	const user = new User({
 		username,
