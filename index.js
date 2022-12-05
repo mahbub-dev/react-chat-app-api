@@ -8,7 +8,8 @@ const env = require("dotenv");
 const mongoose = require("mongoose");
 const app = express();
 env.config();
-app.use(cors({ origin: process.env.CROSS_ORIGIN }));
+app.use(cors({ origin: process.env.CROSS_ORIGIN , methods: [GET,HEAD,PUT,PATCH,POST,DELETE],
+  preflightContinue: false,}));
 app.use(express.urlencoded({ extended: true }), express.json({limit:'100000000'}));
 // server on
 app.listen(process.env.PORT, (err) => {
