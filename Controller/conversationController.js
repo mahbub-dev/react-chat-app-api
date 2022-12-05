@@ -12,10 +12,6 @@ const addConversation = async (req, res) => {
 		const targetedConv = conversation.find((i) =>
 			pattern1.every((ev) => i.member.includes(ev))
 		);
-<<<<<<< HEAD
-=======
-
->>>>>>> 3c217c160135d2ba01739bd1d0ac0ec3eaafbff2
 		if (targetedConv) {
 			res.status(200).json(targetedConv);
 		} else {
