@@ -1,19 +1,12 @@
 const User = require("../Model/User");
-const Conversation = require("../Model/Conversation");
-const Message = require("../Model/Message");
+const sendMail = require("../Utils/sendMail");
 const bcrypt = require("bcrypt");
 // create
 const createUser = async (req, res) => {
 	const { username, email, phone, password } = req.body.signupData;
 	const salt = await bcrypt.genSalt(10);
-	clg(salt);
 	const hashPassword = await bcrypt.hash(password, salt);
-	const user = new User({
-		username,
-		email,
-		phone,
-		password: hashPassword,
-	});
+
 	try {
 		const userlist = await User.findOne({
 			$or: [{ username }, { email }, { phone }],
@@ -23,6 +16,17 @@ const createUser = async (req, res) => {
 				message: 'please provide unique "username","phone","email"',
 			});
 		} else {
+			// email verification
+			const token = sendMail(email, true);
+
+			let createUser = {
+				username,
+				email,
+				phone,
+				password: hashPassword,
+				token,
+			};
+			const user = new User(createUser);
 			const newUser = await user.save();
 			const { password, ...others } = newUser._doc;
 			res.status(200).json(others);
@@ -35,21 +39,33 @@ const createUser = async (req, res) => {
 
 // update
 const updateUser = async (req, res) => {
-	const { updateUserData } = req.body;
+	let { updateUserData } = req.body;
 	const salt = await bcrypt.genSalt(10);
-
-	if (updateUserData?.password) {
-		const hassPassword = await bcrypt.hash(updateUserData.password, salt);
-		updateUserData.password = hassPassword;
-	}
 	let userId = req.user.id;
+
 	// req?.body?.userId ? (userId = req.body.userId) : (userId = req.user.id);
 	try {
+		const user = await User.findById(userId);
+		if (updateUserData?.oldPass) {
+			const isMatch = await bcrypt.compare(
+				updateUserData.oldPass,
+				user.password
+			);
+			if (isMatch) {
+				const hassPassword = await bcrypt.hash(
+					updateUserData.newPass,
+					salt
+				);
+				updateUserData = { password: hassPassword };
+			} else {
+				return res.json("wrongPass");
+			}
+		}
 		await User.findByIdAndUpdate(userId, {
 			$set: updateUserData,
 		});
-		const user = await User.findById(userId);
-		const { password, ...others } = user._doc;
+		const updatedUser = await User.findById(userId);
+		const { password, ...others } = updatedUser._doc;
 		res.status(200).json(others);
 	} catch (e) {
 		console.log(e);
@@ -57,61 +73,63 @@ const updateUser = async (req, res) => {
 	}
 };
 
-// get
+// search user
 const getUser = async (req, res) => {
-	const search = req.query?.search;
-	const userId = req.user.id;
 	try {
-		let user = await User.find();
-		const conversation = await Conversation.find();
-		let loggedUserConv = conversation.filter((i) =>
-			i.member.includes(userId)
-		);
-		let chatFriendId = [];
-		if (loggedUserConv.length > 0) {
-			for (let i = 0; i < loggedUserConv.length; i++) {
-				const element = loggedUserConv[i];
-				chatFriendId.push(element);
+		const email = req?.query?.email;
+		const search = req?.query?.search;
+		const usersId = req?.query?.usersId;
+		const loggedUser = req?.query?.loggedUser;
+		const userId = req.user.id;
+		if (email) {
+			const user = await User.findOne({ email });
+			if (user) {
+				res.status(201).json({ isEmail: true });
+			} else {
+				res.status(201).json({ isEmail: false });
 			}
 		}
-		// console.log(loggedUserConv[0]._id);
-		// const lastMessag = async (conversationId, sender, receiver) => {
-		// 	const messages = await Message.find({ conversationId });
-		// 	let last = { sms: "" };
-		// 	messages.forEach((i) => {
-		// 		i.sender === userId;
-		// 	});
-		// };
-		if (search) {
-			if (search === userId) {
-				let user = await User.findById(userId);
-				const { password, ...others } = user._doc;
-				res.status(200).json(others);
-			} else {
-				const filterUser = user.filter(
-					(i) =>
-						i.username
-							.toLowerCase()
-							.includes(search.toLowerCase()) ||
-						i.phone.includes(search) ||
-						i._id.toString().includes(search.toString()) ||
-						(i.email.toLowerCase().includes(search.toLowerCase()) &&
-							i._id.toString() !== userId)
-				);
-				if (!filterUser) {
-					res.status(201).json(" ");
-				} else {
-					res.status(200).json(filterUser);
-				}
-			}
-		} else {
-			res.status(200).json(
-				user.filter((i) => i._id.toString() !== userId)
+		if (loggedUser !== undefined) {
+			let user = await User.findById(userId);
+			const { password, ...others } = user._doc;
+			return res.status(200).json(others);
+		}
+
+		if (search !== undefined) {
+			let users = await User.find();
+			const filterUser = users.filter(
+				(i) =>
+					i.username.toLowerCase().includes(search.toLowerCase()) ||
+					i.phone.includes(search) ||
+					(i.email.toLowerCase().includes(search.toLowerCase()) &&
+						i._id.toString() !== userId)
 			);
+
+			if (filterUser.length === 0) {
+				return res.status(200).json(users);
+			} else {
+				return res.status(200).json(filterUser);
+			}
 		}
 	} catch (e) {
 		console.log(e);
 		res.status(500);
+	}
+};
+
+// get user
+const getUserById = async (req, res) => {
+	const userId = req.params.userId;
+	try {
+		if (userId === undefined) {
+			res.status(404).json("user not found");
+		} else {
+			const user = await User.findById(userId);
+			res.status(200).json(user);
+		}
+	} catch (err) {
+		console.log(err);
+		res.status(500).json(err);
 	}
 };
 
@@ -132,4 +150,11 @@ const deleteUser = async (req, res) => {
 const uploadFile = async (req, res, next) => {
 	console.log(req.file);
 };
-module.exports = { createUser, updateUser, getUser, deleteUser, uploadFile };
+module.exports = {
+	createUser,
+	updateUser,
+	getUser,
+	deleteUser,
+	uploadFile,
+	getUserById,
+};

@@ -5,6 +5,7 @@ const Message = require("../Model/Message");
 const addConversation = async (req, res) => {
 	const senderId = req.user.id;
 	const { receiverId } = req.body;
+	
 	try {
 		const pattern1 = [senderId, receiverId];
 		const pattern2 = [receiverId, senderId];
@@ -13,6 +14,7 @@ const addConversation = async (req, res) => {
 			pattern1.every((ev) => i.member.includes(ev))
 		);
 		if (targetedConv) {
+
 			res.status(200).json(targetedConv);
 		} else {
 			const newConversation = new Conversation({
@@ -44,6 +46,19 @@ const getConversation = async (req, res) => {
 	}
 };
 
+const deleteConversation = async (req, res) => {
+	try {
+		const convId = req.params.convId;
+		const deleteMessage = await Message.deleteMany({
+			conversationId: convId,
+		});
+		const deleteConv = await Conversation.findByIdAndDelete(convId);
+		res.status(200).json(deleteConv);
+	} catch (err) {
+		console.log(err);
+		res.status(500).json(err);
+	}
+};
 // get two user conversation
 const getTwoUserConversation = async (req, res) => {
 	const { firstUserId, secondUserId } = req.params;
@@ -68,4 +83,9 @@ const getAllConversation = async (req, res) => {
 		res.status(500).json(err);
 	}
 };
-module.exports = { addConversation, getConversation, getTwoUserConversation };
+module.exports = {
+	addConversation,
+	getConversation,
+	getTwoUserConversation,
+	deleteConversation,
+};

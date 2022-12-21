@@ -6,6 +6,7 @@ const {
 	updateUser,
 	getUser,
 	deleteUser,
+	getUserById,
 } = require("../Controller/userController");
 
 // create user
@@ -18,9 +19,10 @@ router.put("/", verifyToken, updateUser);
 //get user
 router.get("/", verifyToken, getUser);
 
+// get by user id 
+router.get("/:userId", getUserById);
+
 // delete user
 router.delete("/:userId", deleteUser);
-
-
 
 module.exports = router;

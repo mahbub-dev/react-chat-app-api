@@ -8,7 +8,6 @@ const addMessage = async (req, res) => {
 	const sender = req.user.id;
 	try {
 		const conversation = await Conversation.findById(conversationId);
-		console.log(conversationId);
 		if (conversation) {
 			const newMessage = new Message({
 				conversationId,

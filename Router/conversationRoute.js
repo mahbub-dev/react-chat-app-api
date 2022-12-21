@@ -1,16 +1,20 @@
 ﻿const router = require("express").Router();
-const {verifyToken}  = require('../Controller/authController')
+const { verifyToken } = require("../Controller/authController");
 const {
 	addConversation,
 	getConversation,
 	getTwoUserConversation,
+	deleteConversation,
 } = require("../Controller/conversationController");
 
 // add conversation
-router.post("/",verifyToken, addConversation);
+router.post("/", verifyToken, addConversation);
+
+//delete conversation
+router.delete("/:convId", verifyToken, deleteConversation);
 
 //get conversation
-router.get("/:userId",verifyToken, getConversation);
+router.get("/:userId", verifyToken, getConversation);
 
 // get two user conversation
 router.get("/find/:firstUserId/:secondUserId", getTwoUserConversation);
