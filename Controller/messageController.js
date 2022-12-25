@@ -17,7 +17,7 @@ const addMessage = async (req, res) => {
 			const savedMessage = await newMessage.save();
 			res.status(200).json(savedMessage);
 		} else {
-			res.json("404 not found");
+			res.status(404).json("not found");
 		}
 	} catch (err) {
 		console.log(err);
@@ -33,7 +33,7 @@ const getMessage = async (req, res) => {
 			conversationId,
 		});
 		if (message.length === 0) {
-			res.status(200).json("not found");
+			res.status(404).json("not found");
 		} else {
 			res.status(200).json(message);
 		}

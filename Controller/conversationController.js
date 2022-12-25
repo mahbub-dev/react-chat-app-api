@@ -5,7 +5,7 @@ const Message = require("../Model/Message");
 const addConversation = async (req, res) => {
 	const senderId = req.user.id;
 	const { receiverId } = req.body;
-	
+
 	try {
 		const pattern1 = [senderId, receiverId];
 		const pattern2 = [receiverId, senderId];
@@ -14,7 +14,6 @@ const addConversation = async (req, res) => {
 			pattern1.every((ev) => i.member.includes(ev))
 		);
 		if (targetedConv) {
-
 			res.status(200).json(targetedConv);
 		} else {
 			const newConversation = new Conversation({
@@ -52,8 +51,8 @@ const deleteConversation = async (req, res) => {
 		const deleteMessage = await Message.deleteMany({
 			conversationId: convId,
 		});
-		const deleteConv = await Conversation.findByIdAndDelete(convId);
-		res.status(200).json(deleteConv);
+
+		res.status(200).json(deleteMessage);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);

@@ -133,7 +133,6 @@ const sendConfirmEmail = async (req, res) => {
 const resetPassword = async (req, res) => {
 	const { email, password } = req.body;
 	const sendmail = req?.query?.sendmail;
-	console.log(sendmail);
 	try {
 		if (sendmail) {
 			const emailId = req?.query?.email;
