@@ -60,10 +60,6 @@ const singupConfirm = async (req, res) => {
 			let user = await User.findOne({ email });
 			if (user) {
 				if (user.token === code) {
-					// const { _doc } = user;
-					// const { token, ...other } = _doc;
-					// user._doc = other;
-
 					user.token = "confirmed";
 					const veryfied = await User.findOneAndUpdate(
 						{ email },
@@ -125,7 +121,6 @@ const sendConfirmEmail = async (req, res) => {
 		}
 	} else {
 		const user = await User.findOne({ email });
-		console.log(user);
 		user ? res.json(false) : res.json(true);
 	}
 };
@@ -136,7 +131,6 @@ const resetPassword = async (req, res) => {
 	try {
 		if (sendmail) {
 			const emailId = req?.query?.email;
-			console.log(emailId);
 			const user = await User.findOne({ email: emailId });
 			if (user) {
 				const token = sendMail(emailId, false);

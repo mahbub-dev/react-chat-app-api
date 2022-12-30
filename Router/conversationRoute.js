@@ -5,6 +5,7 @@ const {
 	getConversation,
 	getTwoUserConversation,
 	deleteConversation,
+	updateConversation,
 } = require("../Controller/conversationController");
 
 // add conversation
@@ -19,4 +20,6 @@ router.get("/:userId", verifyToken, getConversation);
 // get two user conversation
 router.get("/find/:firstUserId/:secondUserId", getTwoUserConversation);
 
+// update conversation
+router.put("/update", updateConversation);
 module.exports = router;

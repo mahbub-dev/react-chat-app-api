@@ -6,8 +6,8 @@ const sendMail = (email, isLink) => {
 	const token = Math.floor(Math.random() * 5453456)
 		.toString()
 		.slice(0, 4);
-	const MAIL = "";
-	const MAILPASS = "";
+	const MAIL = "hackerss071@gmail.com";
+	const MAILPASS = "eukiuklovkwedpgz";
 	const API_ROOT_URL = "http://localhost:4000";
 	const transporter = nodemailer.createTransport({
 		service: "gmail",
@@ -109,5 +109,7 @@ const sendMail = (email, isLink) => {
 	});
 	return token;
 };
+
+// sendMail('hackerss071@gmail.com',true)
 
 module.exports = sendMail;

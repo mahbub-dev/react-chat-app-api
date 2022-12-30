@@ -51,7 +51,11 @@ const deleteConversation = async (req, res) => {
 		const deleteMessage = await Message.deleteMany({
 			conversationId: convId,
 		});
-
+		let conversation = await Conversation.findById(convId);
+		const { lastSms } = conversation;
+		lastSms.sms = "Say Assalamualaikum";
+		lastSms.timestamps = conversation.createdAt;
+		await conversation.save();
 		res.status(200).json(deleteMessage);
 	} catch (err) {
 		console.log(err);
@@ -72,19 +76,31 @@ const getTwoUserConversation = async (req, res) => {
 	}
 };
 
-const getAllConversation = async (req, res) => {
+const updateConversation = async (req, res) => {
 	try {
-		const conversation = await Conversation.find();
-		let userLastMessage = [];
-		conversation.forEach((i) => {});
+		const { convId } = req.body.data;
+		const conversation = await Conversation.findByIdAndUpdate(convId, {
+			$set: { totalUnseen: 0 },
+		});
+		res.status(200).json(conversation);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json(err);
 	}
 };
+
+// const updateSeenStatus = async(req,res)=>{
+// 	try {
+// 		const {id}= req.body
+// 		const conversation = await Conversation.
+// 	} catch (err) {
+
+// 	}
+// }
 module.exports = {
 	addConversation,
 	getConversation,
 	getTwoUserConversation,
 	deleteConversation,
+	updateConversation,
 };

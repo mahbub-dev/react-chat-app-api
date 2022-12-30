@@ -9,6 +9,7 @@ const messageSchema = new mongoose.Schema(
 		sender: {
 			type: String,
 		},
+		isSeen: { type: Boolean, default: false },
 		message: {
 			text: {
 				type: String,

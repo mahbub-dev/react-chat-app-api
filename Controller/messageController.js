@@ -14,6 +14,12 @@ const addMessage = async (req, res) => {
 				sender,
 				message: { text, images: images },
 			});
+			await conversation.updateOne({
+				$set: {
+					lastSms: { sms: text, timestamps: Date.now(), sender },
+					totalUnseen: conversation.totalUnseen + 1,
+				},
+			});
 			const savedMessage = await newMessage.save();
 			res.status(200).json(savedMessage);
 		} else {
@@ -28,18 +34,20 @@ const addMessage = async (req, res) => {
 // get message
 const getMessage = async (req, res) => {
 	const { conversationId } = req.params;
-	try {
-		const message = await Message.find({
-			conversationId,
-		});
-		if (message.length === 0) {
-			res.status(404).json("not found");
-		} else {
-			res.status(200).json(message);
+	if (conversationId !== undefined) {
+		try {
+			const message = await Message.find({
+				conversationId,
+			});
+			if (message.length === 0) {
+				res.status(404).json("not found");
+			} else {
+				res.status(200).json(message);
+			}
+		} catch (err) {
+			console.log(err);
+			res.status(500).json(err);
 		}
-	} catch (err) {
-		console.log(err);
-		res.status(500).json(err);
 	}
 };
 
