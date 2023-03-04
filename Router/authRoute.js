@@ -3,13 +3,18 @@ const {
 	userLogin,
 	singupConfirm,
 	sendConfirmEmail,
-	verifyToken,
 	resetPassword,
-} = require("../Controller/authController");
+	checkUser,
+} = require("..//Controller/auth/authController");
+const verifyToken = require("../Middlewere/verifyToken");
+const confirmEmail = require("../Middlewere/confimEmail");
+const { checkUserByEmail } = require("../Middlewere/checkUser");
+const sendMail = require("../Middlewere/sendMail");
 
-// login
 router.post("/login", userLogin);
-router.get("/signup/confirm/:code", singupConfirm);
+router.get("/:email", checkUser);
+router.post("/confirm", confirmEmail);
+router.post("/sendCode/:email", checkUserByEmail, sendMail);
 router.post("/emailverification", verifyToken, sendConfirmEmail);
-router.post("/resetpassword", resetPassword);
+
 module.exports = router;

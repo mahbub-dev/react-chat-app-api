@@ -1,25 +1,30 @@
 ﻿const router = require("express").Router();
-const { verifyToken } = require("../Controller/authController");
+const verifyToken = require("../Middlewere/verifyToken");
 const {
-	addConversation,
+	addDualConv,
+	addMessage,
+	addGroupConv,
 	getConversation,
-	getTwoUserConversation,
 	deleteConversation,
-	updateConversation,
-} = require("../Controller/conversationController");
+	getMessage,
+} = require("../Controller/conversation/convController");
 
-// add conversation
-router.post("/", verifyToken, addConversation);
+// add dual conversation
+router.post("/dual/:otherId", verifyToken, addDualConv);
+
+// add group conversation
+router.post("/group/", verifyToken, addGroupConv);
+
+// add message
+router.post("/message/", verifyToken, addMessage);
+
+//get conversation
+router.get("/", verifyToken, getConversation);
+
+//get message
+router.get("/message/:convId", verifyToken, getMessage);
 
 //delete conversation
 router.delete("/:convId", verifyToken, deleteConversation);
 
-//get conversation
-router.get("/:userId", verifyToken, getConversation);
-
-// get two user conversation
-router.get("/find/:firstUserId/:secondUserId", getTwoUserConversation);
-
-// update conversation
-router.put("/update", updateConversation);
 module.exports = router;

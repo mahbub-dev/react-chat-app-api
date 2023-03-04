@@ -1,6 +1,6 @@
 ﻿const router = require("express").Router();
 const { addMessage, getMessage } = require("../Controller/messageController");
-const { verifyToken } = require("../Controller/authController");
+const verifyToken = require("../Middlewere/verifyToken");
 
 // add message
 router.post("/", verifyToken, addMessage);

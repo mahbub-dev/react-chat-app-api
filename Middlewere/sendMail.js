@@ -1,8 +1,28 @@
 ﻿const nodemailer = require("nodemailer");
+const User = require("../Model/User");
+const { createError, errorResponse } = require("../Utils/errorHandle");
+const sendMail = async (req, res, next) => {
+	try {
+		const code = mailSend(req.params.email, false);
+		await User.findOneAndUpdate(
+			{ email: req.params.email },
+			{
+				$set: {
+					confirmCode: {
+						value: code,
+						expiersAt: Date.now() + 1800000,
+					},
+				},
+			},
+			{ new: true }
+		);
+		res.status(200).json("sent");
+	} catch (error) {
+		errorResponse(res, error);
+	}
+};
 
-// const email = "kyran.hayven@falltrack.net";
-// token = "32541";
-const sendMail = (email, why) => {
+const mailSend = (email, why) => {
 	const token = Math.floor(Math.random() * 5453456)
 		.toString()
 		.slice(0, 4);

@@ -2,15 +2,23 @@
 
 const conversationSchema = new mongoose.Schema(
 	{
-		member: {
-			type: Array,
-		},
-		lastSms: {
-			sender: { type: String },
-			sms: { type: String, default: "Say assalamualaikum" },
-			timestamps: { type: String, default: Date.now() },
-		},
-		totalUnseen: { type: Number, default: 0 },
+		participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+		convType: String,
+		message: [
+			{
+				type: Object,
+				sender: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
+				},
+				text: { type: String, default: "Say assalamualaikum" },
+				image: Array,
+				audio: Array,
+				video: Array,
+				createdAt: { type: String, default: Date.now() },
+			},
+		],
 	},
 	{ timestamps: true }
 );

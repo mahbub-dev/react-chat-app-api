@@ -38,7 +38,8 @@ const UserSchema = new mongoose.Schema(
 			default: [],
 		},
 		lastActive: { type: String },
-		token: { type: String },
+		confirmCode: { value: { type: String }, expiersAt: { type: Number } },
+		isVerydfied: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );
