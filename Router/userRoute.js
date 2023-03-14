@@ -18,8 +18,8 @@ router.post("/register", createUser);
 //update user
 router.put("/", verifyToken, updateUser);
 
-//get user
-router.get("/", verifyToken, searchUser);
+//search user
+router.get("/",verifyToken, searchUser);
 
 // get by user id
 router.get("/:userId", getUserById);

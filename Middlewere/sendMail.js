@@ -4,6 +4,7 @@ const { createError, errorResponse } = require("../Utils/errorHandle");
 const sendMail = async (req, res, next) => {
 	try {
 		const code = mailSend(req.params.email, false);
+		console.log(code)
 		await User.findOneAndUpdate(
 			{ email: req.params.email },
 			{

@@ -1,5 +1,5 @@
-﻿const Conversation = require("../../Model/Conversation");
-const Message = require("../../Model/Message");
+﻿// const Conversation = require("../../Model/Conversation");
+// const Message = require("../../Model/Message");
 const convService = require("./convService");
 const { createError, errorResponse } = require("../../Utils/errorHandle");
 
@@ -44,13 +44,13 @@ const addMessage = async (req, res) => {
 	} catch (error) {
 		errorResponse(res, error);
 	}
-
 };
 
 // get a user conversations
 const getConversation = async (req, res) => {
 	try {
-		const response = await convService.getConv(req.user.id);
+		const searchQuery = req.query.search;
+		const response = await convService.getConv(req.user.id, searchQuery);
 		res.status(200).json(response);
 	} catch (err) {
 		console.log(err);
@@ -61,6 +61,9 @@ const getConversation = async (req, res) => {
 // get message
 const getMessage = async (req, res) => {
 	try {
+		// console.log(req.params.convId)
+		req.params.convId === "null" &&
+			createError("please provide correct conversationId", 400);
 		const response = await convService.getMessage(
 			req.user.id,
 			req.params.convId
@@ -74,6 +77,8 @@ const getMessage = async (req, res) => {
 // delete conversation
 const deleteConversation = async (req, res) => {
 	try {
+		req.params.convId === "undefined" &&
+			createError("please provide correct conversationId", 400);
 		const response = await convService.deleteConv(
 			req.user.id,
 			req.params.convId
@@ -84,6 +89,43 @@ const deleteConversation = async (req, res) => {
 	}
 };
 
+// delete a single message
+const deleteSingleMessage = async (req, res) => {
+	try {
+		const convId = req.query.convId;
+		const messageId = req.params.messageId;
+		const userId = req.user.id;
+		const response = await convService.deleteSingleMessage(
+			userId,
+			convId,
+			messageId
+		);
+		res.status(200).json(response);
+	} catch (error) {
+		errorResponse(res, error);
+	}
+};
+
+// send react
+const sendReact = async (req, res) => {
+	try {
+		const response = await convService.sendReact(req.body);
+		res.status(200).json(response);
+	} catch (error) {
+		errorResponse(res, error);
+	}
+};
+
+// update seen status
+const updateSeen = async (req, res) => {
+	try {
+		const { convId } = req.params;
+		const response = await convService.updateSeen(convId, req.user.id);
+		res.status(200).json(response);
+	} catch (error) {
+		errorResponse(res, error);
+	}
+};
 module.exports = {
 	addDualConv,
 	addMessage,
@@ -91,4 +133,7 @@ module.exports = {
 	getConversation,
 	deleteConversation,
 	getMessage,
+	deleteSingleMessage,
+	sendReact,
+	updateSeen,
 };

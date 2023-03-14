@@ -1,26 +1,53 @@
 ﻿const mongoose = require("mongoose");
 
-const conversationSchema = new mongoose.Schema(
+const messageSchema = new mongoose.Schema(
 	{
-		participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-		convType: String,
-		message: [
+		sender: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+		text: {
+			type: String,
+			default: "Say assalamualaikum",
+		},
+		react: String,
+		image: Array,
+		audio: Array,
+		video: Array,
+		pdf: Array,
+		createdAt: {
+			type: Date,
+			default: Date.now,
+		},
+		replyRef: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref:'Message'
+		},
+		seenBy: [
 			{
-				type: Object,
-				sender: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-					required: true,
-				},
-				text: { type: String, default: "Say assalamualaikum" },
-				image: Array,
-				audio: Array,
-				video: Array,
-				createdAt: { type: String, default: Date.now() },
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
 			},
 		],
 	},
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model("Conversation", conversationSchema);
+const conversationSchema = new mongoose.Schema(
+	{
+		participants: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
+		convType: String,
+		message: [messageSchema],
+	},
+	{ timestamps: true }
+);
+
+const Message = mongoose.model("Message", messageSchema);
+const Conversation = mongoose.model("Conversation", conversationSchema);
+module.exports = { Conversation, Message };

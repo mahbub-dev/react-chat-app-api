@@ -1,6 +1,7 @@
 ﻿const { create } = require("../../Model/Conversation");
 const Conversation = require("../../Model/Conversation");
 const { createError } = require("../../Utils/errorHandle");
+const axios = require("axios");
 const convDb = require("./convDb");
 // moudule scaffholding
 const convService = {};
@@ -24,9 +25,9 @@ convService.addGroupConv = async (myId, othersId) => {
 };
 
 // add message
-convService.addMessage = async (myId, convId, messag) => {
+convService.addMessage = async (myId, convId, sms) => {
 	try {
-		let res = await convDb.addMessage(convId, { ...messag, sender: myId });
+		let res = await convDb.addMessage(convId, { ...sms, sender: myId });
 		const { message } = res._doc;
 		return message[message.length - 1];
 	} catch (error) {
@@ -36,11 +37,30 @@ convService.addMessage = async (myId, convId, messag) => {
 
 // get conversation
 
-convService.getConv = async (userId) => {
+convService.getConv = async (userId, searchQuery) => {
 	try {
 		const res = await convDb.getConv(userId);
-		!res.length && createError("requested data was not found", 404);
-		return res;
+
+		!res && createError("requested data was not found", 404);
+		return res
+			.map((item) => {
+				const { convType, message, _id, participants } = item?._doc;
+				let user = {};
+				if (convType === "dual") {
+					user = participants.find(
+						(i) => i._id.toString() !== userId
+					);
+				}
+				return {
+					...user?._doc,
+					convId: _id,
+					convType,
+					lastSms: message[message.length - 1],
+				};
+			})
+			.filter((i) =>
+				i.username?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+			);
 	} catch (error) {
 		throw error;
 	}
@@ -49,15 +69,28 @@ convService.getConv = async (userId) => {
 // get message
 convService.getMessage = async (userId, convId) => {
 	try {
-		const res = await convDb.getMessag(convId,1,2);
-		!res.participants.includes(userId) &&
-			createError(
-				"your are not valid person to get this conversation",
-				401
-			);
-		const { message, ...rest } = res;
-
-		return res;
+		const res = await convDb.getMessag(convId, 1, 100);
+		!res && createError("data not found", 404);
+		// !participants.includes(userId) && createError("your are not valid person to get this conversation", 401);
+		let { participants, ...rest } = res?._doc;
+		const arrayOfRef = [];
+		rest.message?.forEach((i, ind, arr) => {
+			if (!i.replyRef) {
+				arrayOfRef.push(i);
+			} else {
+				const replyRef = arr.find(
+					(msg) => msg._id.toString() === i?.replyRef.toString()
+				);
+				arrayOfRef.push({ ...i._doc, replyRef });
+			}
+		});
+		rest.message = arrayOfRef;
+		return {
+			participants: participants?.filter(
+				(u) => !u.toString().includes(userId)
+			),
+			...rest,
+		};
 	} catch (error) {
 		throw error;
 	}
@@ -78,4 +111,34 @@ convService.deleteConv = async (userId, convId) => {
 	}
 };
 
+// delete single message
+convService.deleteSingleMessage = async (userId, convId, messageId) => {
+	try {
+		await convDb.deleteSingleMessage(userId, convId, messageId);
+		return "deleted";
+	} catch (error) {
+		throw error;
+	}
+};
+
+// send react
+convService.sendReact = async (data) => {
+	try {
+		return await convDb.sendReact(data);
+	} catch (error) {
+		throw error;
+	}
+};
+//  update seen status
+convService.updateSeen = async (convId, userId) => {
+	try {
+		const res = await convDb.updateSeen(convId, userId);
+		if (res) {
+			return res;
+		}
+		createError("already udated", 203);
+	} catch (error) {
+		throw error;
+	}
+};
 module.exports = convService;

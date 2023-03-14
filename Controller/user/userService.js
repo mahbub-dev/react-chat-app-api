@@ -2,6 +2,7 @@
 const sendMail = require("../../Utils/sendMail");
 const { createError } = require("../../Utils/errorHandle");
 const { Create, Update, Search, GetUser, Delete } = require("./userDb");
+const convDb = require("../conversation/convDb");
 const axios = require("axios");
 
 // module scaffholding
@@ -49,22 +50,30 @@ userService.update = async (id, data) => {
 };
 
 // search user
-userService.search = async (search) => {
+userService.search = async (search, userId) => {
 	try {
 		const searchs = new Search(search);
-		// if (loggedUser) {
-		// 	let user = await searchs.searchById();
-		// 	const { password, ...others } = user._doc;
-		// 	return others;
-		// }
+		const users = await searchs.searchByAny();
+		!users?.length && createError("usert not found", 404);
+		const chatUser = await convDb.getParticapantsArray(userId);
+		const participantsUser = [];
+		chatUser.forEach((i) => {
+			i.participants.forEach(
+				(item) =>
+					item.toString() !== userId &&
+					participantsUser.push(item.toString())
+			);
+		});
+		participantsUser.push(userId);
+		const user = users.map((i) => {
+			let { password, confirmCode, isVerydfied, chatList, ...rest } =
+				i._doc;
+			return rest;
+		});
 
-		if (search) {
-			const users = await searchs.searchByAny();
-			return users.map((i) => {
-				const { password, ...rest } = i;
-				return rest;
-			});
-		}
+		return user.filter(
+			(i) => !participantsUser.some((id) => i._id.equals(id))
+		);
 	} catch (error) {
 		throw error;
 	}

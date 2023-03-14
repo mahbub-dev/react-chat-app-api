@@ -1,5 +1,8 @@
 const { createError, errorResponse } = require("../../Utils/errorHandle");
+const path = require("path");
+const fs = require("fs");
 const userService = require("./userService");
+const axios = require("axios");
 // create
 const createUser = async (req, res) => {
 	try {
@@ -21,9 +24,30 @@ const createUser = async (req, res) => {
 // update
 const updateUser = async (req, res) => {
 	try {
-		let { updateUserData } = req.body;
-		!updateUserData && createError("provided data is not valid", 401);
-		const response = await userService.update(req.user.id, updateUserData);
+		let {
+			username,
+			email,
+			profilePicture,
+			password,
+			phone,
+			oldPass,
+			newPass,
+		} = req.body;
+		let data = { username, email, password, oldPass, newPass, phone };
+		if (req?.files) {
+			const newProfilePicture = `${process.env.API_ROOT_URL}/uploads/${req.files[0].filename}`;
+			fs.unlink(
+				`${path.dirname(require.main.filename)}/uploads/${
+					profilePicture?.split("/")[4]
+				}`,
+				(err, info) => {
+					if (err) throw err;
+				}
+			);
+			data.profilePicture = newProfilePicture;
+		}
+		!data && createError("provided data is not valid", 401);
+		const response = await userService.update(req.user.id, data);
 		res.status(200).json(response);
 	} catch (err) {
 		errorResponse(res, err);
@@ -34,11 +58,10 @@ const updateUser = async (req, res) => {
 const searchUser = async (req, res) => {
 	try {
 		const search = req.query?.search;
-		const response = await userService.search(search);
+		const response = await userService.search(search, req?.user?.id);
 		res.status(200).json(response);
 	} catch (e) {
-		console.log(e);
-		res.status(500);
+		errorResponse(res, e);
 	}
 };
 
