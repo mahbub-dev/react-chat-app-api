@@ -34,14 +34,24 @@ const updateUser = async (req, res) => {
 			newPass,
 		} = req.body;
 		let data = { username, email, password, oldPass, newPass, phone };
+
 		if (req?.files) {
 			const newProfilePicture = `${process.env.API_ROOT_URL}/uploads/${req.files[0].filename}`;
-			fs.unlink(
-				`${path.dirname(require.main.filename)}/uploads/${
-					profilePicture?.split("/")[4]
-				}`,
-				(err, info) => {
+			// check if there is an existing file or not
+			fs.readdir(
+				`${path.dirname(require.main.filename)}/uploads`,
+				(err, files) => {
 					if (err) throw err;
+					if (files.includes(profilePicture?.split("/")[4])) {
+						fs.unlink(
+							`${path.dirname(require.main.filename)}/uploads/${
+								profilePicture?.split("/")[4]
+							}`,
+							(err, info) => {
+								if (err) throw err;
+							}
+						);
+					} else return;
 				}
 			);
 			data.profilePicture = newProfilePicture;
