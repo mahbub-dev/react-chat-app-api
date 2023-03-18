@@ -11,18 +11,15 @@ const messageSchema = new mongoose.Schema(
 			type: String,
 			default: "Say assalamualaikum",
 		},
+		attachment: { links: Array, fileType: String },
 		react: String,
-		images: Array,
-		audios: Array,
-		videos: Array,
-		pdf: Array,
 		createdAt: {
 			type: Date,
 			default: Date.now,
 		},
 		replyRef: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref:'Message'
+			ref: "Message",
 		},
 		seenBy: [
 			{
