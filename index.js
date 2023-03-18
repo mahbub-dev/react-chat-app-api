@@ -1,6 +1,7 @@
 ﻿const express = require("express");
 const userRouter = require("./Router/userRoute");
 const authRouter = require("./Router/authRoute");
+const uploadRouter = require("./Router/uploadRoute");
 const path = require("path");
 const conversationRouter = require("./Router/conversationRoute.js");
 // const uploadRoute = require("./Router/uploadRoute");
@@ -60,6 +61,7 @@ app.listen(process.env.PORT, (err) => {
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
 app.use("/conversation", conversationRouter);
+app.use("/", uploadRouter);
 app.get("/uploads/:fileName", (req, res) => {
 	try {
 		const link = path.join(`${__dirname}/uploads`, req.params.fileName);
@@ -68,4 +70,3 @@ app.get("/uploads/:fileName", (req, res) => {
 		errorResponse(res, error);
 	}
 });
-

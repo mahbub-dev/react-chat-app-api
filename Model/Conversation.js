@@ -12,9 +12,9 @@ const messageSchema = new mongoose.Schema(
 			default: "Say assalamualaikum",
 		},
 		react: String,
-		image: Array,
-		audio: Array,
-		video: Array,
+		images: Array,
+		audios: Array,
+		videos: Array,
 		pdf: Array,
 		createdAt: {
 			type: Date,
