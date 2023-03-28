@@ -27,7 +27,11 @@ convService.addGroupConv = async (myId, othersId) => {
 // add message
 convService.addMessage = async (myId, convId, sms) => {
 	try {
-		let res = await convDb.addMessage(convId, { ...sms, sender: myId });
+		let res = await convDb.addMessage(convId, {
+			...sms,
+			sender: myId,
+			seenBy: myId,
+		});
 		const { message } = res._doc;
 		return message[message.length - 1];
 	} catch (error) {
