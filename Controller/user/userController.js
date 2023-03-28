@@ -33,31 +33,32 @@ const updateUser = async (req, res) => {
 			oldPass,
 			newPass,
 		} = req.body;
-		let data = { username, email, password, oldPass, newPass, phone };
 
-		if (req?.files) {
-			const newProfilePicture = `${process.env.API_ROOT_URL}/uploads/${req.files[0].filename}`;
-			// check if there is an existing file or not
-			fs.readdir(
-				`${path.dirname(require.main.filename)}/uploads`,
-				(err, files) => {
-					if (err) throw err;
-					if (files.includes(profilePicture?.split("/")[4])) {
-						fs.unlink(
-							`${path.dirname(require.main.filename)}/uploads/${
-								profilePicture?.split("/")[4]
-							}`,
-							(err, info) => {
-								if (err) throw err;
-							}
-						);
-					} else return;
-				}
-			);
-			data.profilePicture = newProfilePicture;
-		}
-		!data && createError("provided data is not valid", 401);
-		const response = await userService.update(req.user.id, data);
+		// if (req?.files) {
+		// const newProfilePicture = `${process.env.API_ROOT_URL}/uploads/${req.files[0].filename}`;
+		// check if there is an existing file or not
+		// 	fs.readdir(
+		// 		`${path.dirname(require.main.filename)}/uploads`,
+		// 		(err, files) => {
+		// 			if (err) throw err;
+		// 			if (files.includes(profilePicture?.split("/")[4])) {
+		// 				fs.unlink(
+		// 					`${path.dirname(require.main.filename)}/uploads/${
+		// 						profilePicture?.split("/")[4]
+		// 					}`,
+		// 					(err, info) => {
+		// 						if (err) throw err;
+		// 					}
+		// 				);
+		// 			} else return;
+		// 		}
+		// 	);
+		// 	data.profilePicture = newProfilePicture;
+		// }
+
+		!Object.keys(req.body).length === 0 &&
+			createError("provided data is not valid", 401);
+		const response = await userService.update(req.user.id, req.body);
 		res.status(200).json(response);
 	} catch (err) {
 		errorResponse(res, err);
