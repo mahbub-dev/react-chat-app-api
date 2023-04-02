@@ -44,9 +44,8 @@ convService.addMessage = async (myId, convId, sms) => {
 convService.getConv = async (userId, searchQuery) => {
 	try {
 		const res = await convDb.getConv(userId);
-
 		!res && createError("requested data was not found", 404);
-		return res
+		const filterConv = res
 			.map((item) => {
 				const { convType, message, _id, participants } = item?._doc;
 				let user = {};
@@ -65,6 +64,8 @@ convService.getConv = async (userId, searchQuery) => {
 			.filter((i) =>
 				i.username?.toLowerCase()?.includes(searchQuery?.toLowerCase())
 			);
+		filterConv.length === 0 && createError("not found", 404);
+		return filterConv;
 	} catch (error) {
 		throw error;
 	}
@@ -73,8 +74,10 @@ convService.getConv = async (userId, searchQuery) => {
 // get message
 convService.getMessage = async (userId, convId) => {
 	try {
-		const res = await convDb.getMessag(convId, 1, 100);
-		!res && createError("data not found", 404);
+		let res = await convDb.getMessag(convId, 1, 100);
+		let messageStatus = 200;
+		res.message.length === 0 && (messageStatus = 404);
+
 		// !participants.includes(userId) && createError("your are not valid person to get this conversation", 401);
 		let { participants, ...rest } = res?._doc;
 		const arrayOfRef = [];
@@ -89,11 +92,13 @@ convService.getMessage = async (userId, convId) => {
 			}
 		});
 		rest.message = arrayOfRef;
+
 		return {
 			participants: participants?.filter(
 				(u) => !u.toString().includes(userId)
 			),
 			...rest,
+			messageStatus,
 		};
 	} catch (error) {
 		throw error;

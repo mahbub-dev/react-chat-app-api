@@ -71,9 +71,11 @@ userService.search = async (search, userId) => {
 			return rest;
 		});
 
-		return user.filter(
+		const filteredUser = user.filter(
 			(i) => !participantsUser.some((id) => i._id.equals(id))
 		);
+		filteredUser.length === 0 && createError("usert not found", 404);
+		return filteredUser;
 	} catch (error) {
 		throw error;
 	}
@@ -118,7 +120,7 @@ userService.changeMail = async (id, email, password, code) => {
 		} catch (error) {
 			createError(error.response.data, 401);
 		}
-		console.log(email)
+		console.log(email);
 		return await changeMail.updateUser({ email });
 	} catch (error) {
 		throw error;
