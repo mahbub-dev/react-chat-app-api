@@ -35,7 +35,7 @@ const addMessage = async (req, res) => {
 		const { convId, message } = req.body;
 		(!convId || Object.keys(message).length > 6) &&
 			createError("required data is not valid", 401);
-			
+
 		const response = await convService.addMessage(
 			req.user.id,
 			convId,

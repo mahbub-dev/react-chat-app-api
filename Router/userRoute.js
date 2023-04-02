@@ -9,6 +9,7 @@ const {
 	deleteUser,
 	getUserById,
 	resetPassword,
+	changeMail,
 	singupConfirm,
 } = require("../Controller/user/userController");
 
@@ -19,7 +20,7 @@ router.post("/register", createUser);
 router.put("/", verifyToken, updateUser);
 
 //search user
-router.get("/",verifyToken, searchUser);
+router.get("/", verifyToken, searchUser);
 
 // get by user id
 router.get("/:userId", getUserById);
@@ -30,5 +31,5 @@ router.delete("/:userId", deleteUser);
 // reset password
 router.post("/passreset/", verifyToken, resetPassword);
 // change email
-router.post("/changemail/", verifyToken);
+router.post("/changemail/", verifyToken, changeMail);
 module.exports = router;

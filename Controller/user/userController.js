@@ -55,7 +55,7 @@ const updateUser = async (req, res) => {
 		// 	);
 		// 	data.profilePicture = newProfilePicture;
 		// }
-
+		console.log(req);
 		!Object.keys(req.body).length === 0 &&
 			createError("provided data is not valid", 401);
 		const response = await userService.update(req.user.id, req.body);
@@ -105,7 +105,14 @@ const changeMail = async (req, res) => {
 	try {
 		const id = req.user.id;
 		const email = req.body.email;
-		const response = await userService.resetPass(id, email);
+		const password = req.body.password;
+		const code = req.body.code;
+		const response = await userService.changeMail(
+			id,
+			email,
+			password,
+			code
+		);
 		res.status(200).json(response);
 	} catch (error) {
 		errorResponse(res, error);
