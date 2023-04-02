@@ -54,8 +54,7 @@ const getConversation = async (req, res) => {
 		const response = await convService.getConv(req.user.id, searchQuery);
 		res.status(200).json(response);
 	} catch (err) {
-		console.log(err);
-		res.status(500).json(err);
+		errorResponse(res, err);
 	}
 };
 
