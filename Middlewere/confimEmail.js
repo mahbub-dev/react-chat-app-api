@@ -5,7 +5,9 @@ const { createError, errorResponse } = require("../Utils/errorHandle");
 const confirmEmail = async (req, res, next) => {
 	try {
 		const { email, code } = req.query;
-		let user = await User.findOne({ email });
+		let user = await User.findOne({
+			$or: [{ email }, { _id: req?.query?.id }],
+		});
 		!user && createError("user not exist", 404);
 		req.id = user._id.toString();
 		const condition = user?.confirmCode?.expiersAt > Date.now();

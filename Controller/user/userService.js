@@ -105,11 +105,21 @@ userService.delete = async (id) => {
 };
 
 // change email
-userService.changeMail = async (id, email) => {
+userService.changeMail = async (id, email, password, code) => {
 	try {
 		const changeMail = new Update(id);
-		await resetpass.updateUser({ email });
-		return true;
+		const user = await changeMail.getUserById();
+		const checkPass = await bcrypt.compare(password, user.password);
+		!checkPass && createError("wrong password", 400);
+		try {
+			await axios.post(
+				`${process.env.API_ROOT_URL}/auth/confirm/?email=${email}&code=${code}&id=${id}`
+			);
+		} catch (error) {
+			createError(error.response.data, 401);
+		}
+		console.log(email)
+		return await changeMail.updateUser({ email });
 	} catch (error) {
 		throw error;
 	}

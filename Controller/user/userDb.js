@@ -49,7 +49,6 @@ class Update {
 			throw error;
 		}
 	}
-
 	// update database
 	async updateUser(data) {
 		try {
