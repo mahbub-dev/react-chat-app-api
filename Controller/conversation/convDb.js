@@ -90,7 +90,8 @@ convDb.deleteWholeConv = async (convId) => {
 	}
 };
 
-convDb.getMessag = async (id, page, perPage) => {
+convDb.getMessag = async (id, page) => {
+	console.log(page)
 	try {
 		const conversation = await Conversation.findById(id)
 			.populate({
@@ -98,7 +99,10 @@ convDb.getMessag = async (id, page, perPage) => {
 				select: "_id username profilePicture text",
 				model: "User",
 			})
-			.slice("message", -(page * perPage));
+			.select({
+				message: { $slice: [-page, 30] },
+			})
+			.exec();
 		return conversation;
 	} catch (error) {
 		throw error;
@@ -171,10 +175,13 @@ convDb.updateSeen = async (convId, userId) => {
 
 convDb.getParticapantsArray = async (userId) => {
 	try {
-		return await Conversation.find({
-			convType: 'dual',
-			participants: { $in: [userId] }
-		  }, 'participants').lean();
+		return await Conversation.find(
+			{
+				convType: "dual",
+				participants: { $in: [userId] },
+			},
+			"participants"
+		).lean();
 	} catch (error) {
 		throw error;
 	}
