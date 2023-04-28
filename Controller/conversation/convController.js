@@ -62,11 +62,14 @@ const getConversation = async (req, res) => {
 const getMessage = async (req, res) => {
 	try {
 		// console.log(req.params.convId)
+		const page = Number(req.query.page);
 		req.params.convId === "null" &&
 			createError("please provide correct conversationId", 400);
 		const response = await convService.getMessage(
 			req.user.id,
-			req.params.convId
+			req.params.convId,
+			page,
+			
 		);
 		res.status(200).json(response);
 	} catch (error) {

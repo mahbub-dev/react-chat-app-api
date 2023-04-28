@@ -72,9 +72,9 @@ convService.getConv = async (userId, searchQuery) => {
 };
 
 // get message
-convService.getMessage = async (userId, convId) => {
+convService.getMessage = async (userId, convId,page) => {
 	try {
-		let res = await convDb.getMessag(convId, 1, 100);
+		let res = await convDb.getMessag(convId, page);
 		let messageStatus = 200;
 		res.message.length === 0 && (messageStatus = 404);
 
