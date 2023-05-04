@@ -57,6 +57,9 @@ app.listen(process.env.PORT, (err) => {
 });
 
 // App Routers
+app.get("/", (req, res) => {
+	res.sendFile(`${__dirname}/welcome.html`);
+});
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
 app.use("/conversation", conversationRouter);
