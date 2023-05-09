@@ -7,7 +7,7 @@ const userLogin = async (req, res) => {
 	try {
 		const { loginId, password } = req.body;
 		// find requested user
-		const response = await authService.login(loginId, password);
+		const response = await authService.login(req,loginId, password);
 		res.status(200).json(response);
 	} catch (e) {
 		errorResponse(res, e);
@@ -19,7 +19,7 @@ const singupConfirm = async (req, res) => {
 		const id = req.id;
 		const redirect = req.query?.redirect;
 		// get res from inner layer
-		const response = await authService.signupConfirm(id, isReqFormClient);
+		const response = await authService.signupConfirm(req,id, isReqFormClient);
 		// send Response
 		!response &&
 			console.log(response) &&

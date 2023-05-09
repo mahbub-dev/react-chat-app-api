@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 const { createError, errorResponse } = require("./Utils/errorHandle");
 const app = express();
 env.config();
-app.use(cors({ origin: process.env.CROSS_ORIGIN }));
+app.use(cors({ origin: process.env.CROSS_ORIGIN || '*'}));
 app.use(
 	express.urlencoded({
 		limit: "50mb",

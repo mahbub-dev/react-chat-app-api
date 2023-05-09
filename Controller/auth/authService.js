@@ -4,12 +4,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Login, ConfirmEmailSend } = require("./authDb");
 const sendMail = require("../../Utils/sendMail");
+const { getRootUrl } = require("../../Utils/getRootUrl");
+const sendingMail = require("../../Utils/sendMail");
 // const { singupConfirm } = require("./authController");
 // module.scaffholding
 const authService = {};
 
 // login
-authService.login = async (username, password) => {
+authService.login = async (req,username, password) => {
 	try {
 		// create login instacne
 		const loginUser = new Login(username);
@@ -24,9 +26,9 @@ authService.login = async (username, password) => {
 
 		if (!user?.isVerydfied) {
 			const response = await axios.post(
-				`${process.env.API_ROOT_URL}/auth//sendCode/${user?.email}`
+				`${getRootUrl(req)}/auth//sendCode/${user?.email}`
 			);
-			createError("email is not confirmed", 403);
+			createError("The email is not verified", 403);
 		} else {
 			const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 			!token && createError("somthing went wrong with jwt", 500);
@@ -40,13 +42,18 @@ authService.login = async (username, password) => {
 };
 
 // change email
-authService.sendConfirmEmail = async (userId, email, password) => {
+authService.sendConfirmEmail = async (req,userId, email, password) => {
 	try {
 		const confirmEmailSend = new ConfirmEmailSend(userId);
 		let user = await confirmEmailSend.getUserById();
 		const isMatch = await bcrypt.compare(password, user.password);
 		!isMatch && createError("invalid password", 403);
-		return sendMail(email, false);
+		return await sendingMail(
+			email,
+			"email change",
+			user.username,
+			getRootUrl(req)
+		);
 	} catch (error) {
 		throw error;
 	}
