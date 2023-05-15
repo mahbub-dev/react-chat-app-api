@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Verification Email</title>
+    <style>
+      /* Fonts */
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f8f8;
+      }
+
+      /* Heading */
+      .heading {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 28px;
+        font-weight: 400;
+        text-align: center;
+        color: #333;
+      }
+
+      /* Link */
+      .link {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+
+      /* Token */
+      .token {
+        margin-top: 20px;
+        margin-bottom: 0;
+        font-size: 20px;
+        font-weight: 400;
+        text-align: center;
+        color: #333;
+      }
+
+      /* Signature */
+      .signature {
+        margin-top: 20px;
+        text-align: right;
+        font-size: 14px;
+        color: #777;
+      }
+
+      /* Logo */
+      .logo {
+        display: block;
+        margin: 0 auto;
+        width: 150px;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="heading">Verification Email</h1>
+      <p>Dear <%= userName %>,</p>
+      <p>Thank you for registering with our service. To complete your registration, please click on the following link to verify your email address:</p>
+      <p><a class="link" href="<%= verificationLink %>">Verify Email Address</a></p>
+      <p class="token">Your verification token is: <strong><%= verificationToken %></strong></p>
+      <p>Please enter this token on the verification page to complete your registration.</p>
+      <p>If you did not register for our service, please ignore this email.</p>
+      <p class="signature">Best regards,<br>The <%= companyName %> Team</p>
+    </div>
+  </body>
+</html>

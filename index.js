@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 const { createError, errorResponse } = require("./Utils/errorHandle");
 const app = express();
 env.config();
-app.use(cors({ origin: process.env.CROSS_ORIGIN }));
+app.use(cors({ origin: process.env.CROSS_ORIGIN || '*'}));
 app.use(
 	express.urlencoded({
 		limit: "50mb",
@@ -57,6 +57,9 @@ app.listen(process.env.PORT, (err) => {
 });
 
 // App Routers
+app.get("/", (req, res) => {
+	res.sendFile(`${__dirname}/welcome.html`);
+});
 app.use("/user", userRouter);
 app.use("/auth", authRouter);
 app.use("/conversation", conversationRouter);

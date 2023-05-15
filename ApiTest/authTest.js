@@ -40,7 +40,7 @@ const confirmEmail = async (email, code) => {
 		console.log(error.response.data);
 	}
 };
-confirmEmail("mahfuj@gmail.com", 1044);
+// confirmEmail("mahfuj@gmail.com", 1044);
 
 // send confirm code
 const sendConfirmCode = async (email) => {
@@ -51,4 +51,4 @@ const sendConfirmCode = async (email) => {
 		console.log(error.response.data);
 	}
 };
-// sendConfirmCode('hsmahbub@gmail.com');
+sendConfirmCode('hsmahbub@gmail.com');
