@@ -1,4 +1,5 @@
-﻿const { Conversation, Message } = require("../../Model/Conversation");
+﻿const { default: mongoose } = require("mongoose");
+const { Conversation, Message } = require("../../Model/Conversation");
 const { createError } = require("../../Utils/errorHandle");
 
 // module scaffholding
@@ -29,7 +30,7 @@ convDb.addMessage = async (_id, message) => {
 				},
 			},
 			{ new: true }
-		).populate("message.sender", "_id username profilePicture");
+		)
 		return res;
 	} catch (error) {
 		throw error;
@@ -91,19 +92,35 @@ convDb.deleteWholeConv = async (convId) => {
 };
 
 convDb.getMessag = async (id, page) => {
-	console.log(page)
 	try {
-		const conversation = await Conversation.findById(id)
-			.populate({
-				path: "message.sender participants",
-				select: "_id username profilePicture text",
-				model: "User",
-			})
-			.select({
-				message: { $slice: [-page, 30] },
-			})
-			.exec();
-		return conversation;
+		const pipeline = [
+			{ $match: { _id: mongoose.Types.ObjectId(id) } },
+			{
+				$lookup: {
+					from: "users",
+					localField: "participants",
+					foreignField: "_id",
+					as: "participants",
+				},
+			},
+			{
+				$addFields: {
+					totalMessages: { $size: "$message" },
+					message: { $slice: ["$message", -page] }
+				},
+			},
+			{
+				$project: {
+					participants: 1,
+					totalMessages: 1,
+					convType: 1,
+					message: 1,
+				},
+			},
+		];
+
+		const conversation = await Conversation.aggregate(pipeline);
+		return conversation[0];
 	} catch (error) {
 		throw error;
 	}

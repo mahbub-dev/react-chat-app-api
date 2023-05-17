@@ -72,14 +72,13 @@ convService.getConv = async (userId, searchQuery) => {
 };
 
 // get message
-convService.getMessage = async (userId, convId,page) => {
+convService.getMessage = async (userId, convId, page) => {
 	try {
 		let res = await convDb.getMessag(convId, page);
 		let messageStatus = 200;
 		res.message.length === 0 && (messageStatus = 404);
-
 		// !participants.includes(userId) && createError("your are not valid person to get this conversation", 401);
-		let { participants, ...rest } = res?._doc;
+		let { participants, ...rest } = res;
 		const arrayOfRef = [];
 		rest.message?.forEach((i, ind, arr) => {
 			if (!i.replyRef) {
@@ -88,7 +87,7 @@ convService.getMessage = async (userId, convId,page) => {
 				const replyRef = arr.find(
 					(msg) => msg._id.toString() === i?.replyRef.toString()
 				);
-				arrayOfRef.push({ ...i._doc, replyRef });
+				arrayOfRef.push({ ...i, replyRef });
 			}
 		});
 		rest.message = arrayOfRef;
