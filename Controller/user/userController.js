@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const userService = require("./userService");
 const axios = require("axios");
+const { getRootUrl } = require("../../Utils/getRootUrl");
 // create
 const createUser = async (req, res) => {
 	try {
@@ -14,6 +15,7 @@ const createUser = async (req, res) => {
 			email,
 			phone,
 			password,
+			rootUrl: getRootUrl(req),
 		});
 		res.status(201).json(response);
 	} catch (err) {

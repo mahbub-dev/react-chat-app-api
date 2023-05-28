@@ -4,12 +4,12 @@ const { createError } = require("../../Utils/errorHandle");
 const { Create, Update, Search, GetUser, Delete } = require("./userDb");
 const convDb = require("../conversation/convDb");
 const axios = require("axios");
-
+const { getRootUrl } = require("../../Utils/getRootUrl");
 // module scaffholding
 const userService = {};
 
 // signup
-userService.create = async ({ username, email, phone, password: pass }) => {
+userService.create = async ({ username, email, phone, password: pass,rootUrl }) => {
 	try {
 		const salt = await bcrypt.genSalt(10);
 		const hashPassword = await bcrypt.hash(pass, salt);
@@ -18,7 +18,7 @@ userService.create = async ({ username, email, phone, password: pass }) => {
 		user && createError("please provide unique email or username", 400);
 		await create.createUser();
 		// email verification
-		await axios.post(`${process.env.API_ROOT_URL}/auth/sendCode/${email}`);
+		await axios.post(`${rootUrl}/auth/sendCode/${email}`);
 		// const { password, confirmCode, isVerydfied, ...others } = newUser._doc;
 		return true;
 	} catch (error) {
