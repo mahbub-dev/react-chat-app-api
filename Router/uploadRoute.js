@@ -2,12 +2,12 @@ const router = require("express").Router();
 const path = require("path");
 const fs = require("fs");
 const { errorResponse, createError } = require("../Utils/errorHandle");
-
+const { getRootUrl } = require("../Utils/getRootUrl");
 router.post("/uploads", (req, res) => {
 	try {
 		if (req.files.length > 0) {
 			const arrayOflink = req.files.map((i) => {
-				const link = `${process.env.API_ROOT_URL}/uploads/${i.filename}`;
+				const link = `${getRootUrl(req)}/uploads/${i.filename}`;
 				return link;
 			});
 			res.status(200).json(arrayOflink);
